@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE."""
 import bs4
 import requests
 
-def get_soup(page):
+def _get_soup(page):
 	"""Return BeautifulSoup object for given page"""
 	request = requests.get(page)
 	data = request.text
@@ -101,7 +101,7 @@ class Torrent(object):
 			return self._download
 
 		# No data. Parse torrent page
-		soup = get_soup(self.page)
+		soup = _get_soup(self.page)
 		self._download = soup.find("a", class_="siteButton giantButton").get("href")
 		self._data = soup # Store for later
 		return self._download
@@ -115,7 +115,7 @@ class Torrent(object):
 			self._magnet = self._data.find("a", class_="magnetlinkButton").get("href")
 			return self._magnet
 
-		soup = get_soup(self.page)
+		soup = _get_soup(self.page)
 		self._magnet = soup.find("a", class_="magnetlinkButton").get("href")
 		self._data = soup
 		return self._magnet
@@ -147,7 +147,6 @@ class Search(object):
 		if not self.current_url:
 			self.current_url = url
 
-		print "Current url: ", self.current_url
 		if self.current_url == Search.base_url:
 			# Searching home page so no formatting
 			results = self._get_results(self.current_url)
@@ -159,7 +158,6 @@ class Search(object):
 
 			# Now get the results.
 			for i in range(pages):
-				print "Getting: ", (search + "/" + str(self._current_page) + "/" + sorting)
 				results = self._get_results(search + "/" + str(self._current_page) + 
 											"/" + sorting)
 				self._add_results(results)
@@ -220,7 +218,7 @@ class Search(object):
 		"""Find every div tag containing torrent details on given page, 
 			then parse the results into a list of Torrents and return them"""
 		
-		soup = get_soup(page)
+		soup = _get_soup(page)
 		details = soup.find_all("tr", class_="odd")
 		even = soup.find_all("tr", class_="even")
 		# Join the results 
