@@ -90,7 +90,7 @@ class Torrent(object):
 			return self._magnet
 
 		if self._data:
-			self._magnet = soup.find("a", class_="magnetlinkButton").get("href")
+			self._magnet = self._data.find("a", class_="magnetlinkButton").get("href")
 			return self._magnet
 
 		soup = get_soup(self.page)
@@ -110,7 +110,6 @@ class Search(object):
 	latest_url = "http://kickass.to/new"
 
 	def __init__(self):
-		"""Retrieve search results for term"""
 		self.torrents = list()
 		self._current_page = 1
 		self.term = None
@@ -129,7 +128,7 @@ class Search(object):
 		print "Current url: ", self.current_url
 		if self.current_url == Search.base_url:
 			# Searching home page so no formatting
-			results = self.get_results(self.current_url)
+			results = self._get_results(self.current_url)
 			self._add_results(results)
 		else:
 
@@ -139,7 +138,7 @@ class Search(object):
 			# Now get the results.
 			for i in range(pages):
 				print "Getting: ", (search + "/" + str(self._current_page) + "/" + sorting)
-				results = self.get_results(search + "/" + str(self._current_page) + 
+				results = self._get_results(search + "/" + str(self._current_page) + 
 											"/" + sorting)
 				self._add_results(results)
 				self._current_page += 1
@@ -148,14 +147,14 @@ class Search(object):
 	def popular(self, category):
 		self.search(url=Search.base_url)
 		if category:
-			self.categorize(category)
+			self._categorize(category)
 
 	def recent(self, category, pages, sort, order):
 		self.search(pages=pages, url=Search.latest_url, sort=sort, order=order)
 		if category:
-			self.categorize(category)
+			self._categorize(category)
 		
-	def categorize(self, category):
+	def _categorize(self, category):
 		"""Remove torrents with unwanted category from self.torrents"""
 		self.torrents = [result for result in self.torrents
 						 if result.category == category]
@@ -164,12 +163,12 @@ class Search(object):
 		sorting = ""
 		if sort:
 			self.sort = sort
-			sorting = "?field=" + sort
+			sorting = "?field=" + self.sort
 			if order:
 				self.order = order
 			else:
 				self.order = Sorting.Order.DESC
-			sorting = sorting + "&sorder=" + order
+			sorting = sorting + "&sorder=" + self.order
 		return sorting
 
 	def _format_search(self, term, category):
@@ -192,9 +191,10 @@ class Search(object):
 					sort=self.sort, order=self.order)
 
 	def next_page(self):
+		"""Get next page of search results."""
 		self.page(self._current_page + 1)
 
-	def get_results(self, page):
+	def _get_results(self, page):
 		"""Find every div tag containing torrent details on given page, 
 			then parse the results into a list of Torrents and return them"""
 		
@@ -205,9 +205,9 @@ class Search(object):
 		for i in range(len(even)):
 			details.insert((i * 2)+1, even[i])
 
-		return self.parse_details(details)
+		return self._parse_details(details)
 
-	def parse_details(self, tag_list):
+	def _parse_details(self, tag_list):
 		"""Given a list of tags from either a search page or the
 		   KAT home page parse the details and return a list of 
 		   Torrents"""
@@ -235,16 +235,16 @@ class Search(object):
 			# Get category changes depending on if we're parsing
 			# the home page or a search page.
 			if self.current_url == self.base_url:
-				category = self.get_torrent_category(item, result=i)
+				category = self._get_torrent_category(item, result=i)
 			else:
-				category = self.get_torrent_category(item)
+				category = self._get_torrent_category(item)
 
 			result.append(Torrent(title_text, category, link, size, seed,
 								leech, magnet, download,files, age))
 
 		return result
 
-	def get_torrent_category(self, tag, result=None):
+	def _get_torrent_category(self, tag, result=None):
 		"""Given a tag containing torrent details try to find category
 		   of torrent. In search pages the category is found in links of
 		   the form <a href='/tv/'>TV</a> with TV replaced with movies, books
@@ -285,19 +285,23 @@ class Search(object):
 
 # Functions to be called by user -----------------------------------------
 def search(term, category=Categories.ALL, pages=1, sort=None, order=None):
-	"""Return a search result for term in category"""
+	"""Return a search result for term in category. Can also be 
+		sorted and span multiple pages."""
 	s = Search()
 	s.search(term=term, category=category, pages=pages, sort=sort, order=order)
 	return s
 
 def popular(category=None):
-	"""Return a search result containing popular torrents in category"""
+	"""Return a search result containing torrents appearing
+		on the KAT home page. Can be categorized. Cannot be
+		sorted or contain multiple pages"""
 	s = Search()
 	s.popular(category)
 	return s
 
 def recent(category=None, pages=1, sort=None, order=None):
-	"""Return most recently added torrents"""
+	"""Return most recently added torrents. Can be sorted and categorized 
+		and contain multiple pages."""
 	s = Search()
 	s.recent(category, pages, sort, order)
 	return s
