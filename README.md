@@ -13,7 +13,7 @@ import kat
 home = kat.popular()
 
 # See information about first result 
-home[0].title # Some torrent title
+print home[0].title # Some torrent title
 
 # Or print out details of every torrent returned
 
@@ -26,8 +26,8 @@ for torrent in home:
 home_games = kat.popular(category=kat.Categories.GAMES)
 
 # We can see how many results we got
-len(home) # 70
-len(home_games) # 10
+print len(home) # 70
+print len(home_games) # 10
 
 
 # ----------------------------------------------------------------------
@@ -44,7 +44,7 @@ s = kat.search("the walking dead", category=kat.Categories.TV,
 # They can also span multiple pages
 multi = kat.search("the walking dead", pages=3)
 # And we can keep track of the current page
-multi.current_page # 3
+print multi.current_page # 3
 
 # We can go to a particular page
 multi.page(7)
