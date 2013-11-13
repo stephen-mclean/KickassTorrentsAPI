@@ -107,3 +107,7 @@ r = kat.recent()
 * age
 * page
 * print_details()
+
+### TODO
+* Implement sorting for kat.popular() 
+* Trying to get a page after the end of the results returns the first page, I want to make it return nothing.
