@@ -1,6 +1,17 @@
 # KAT
 An unofficial Python API for [KickAssTorrents](http://kickass.to/)
 
+### Installation
+```
+pip install kat
+```
+Or:
+(https://pypi.python.org/pypi/kat/0.1.9)
+Download and un-pack.
+```
+python setup.py install
+```
+
 ### Usage
 Perform searches using kat.popular(), kat.search() and kat.recent()
 Results returned are iterable and can be accessed individually to
@@ -96,10 +107,3 @@ r = kat.recent()
 * age
 * page
 * print_details()
-
-### Installation
-(https://pypi.python.org/pypi/kat/0.1.9)
-Download and un-pack.
-```
-python setup.py install
-```
