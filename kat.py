@@ -13,17 +13,17 @@ The MIT License (MIT)
 Copyright (c) [2013] [Stephan McLean]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), 
-to deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, 
+of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense,
 and/or sell copies of the Software, and to permit persons to whom the Software
 is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included
 in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
@@ -80,22 +80,22 @@ class Torrent(object):
 
 	def print_details(self):
 		"""Print torrent details"""
-		print "Title:", self.title
-		print "Category:", self.category
-		print "Page: ", self.page
-		print "Size: ", self.size
-		print "Files: ", self.files
-		print "Age: ", self.age
-		print "Seeds:", self.seeders
-		print "Leechers: ", self.leechers
-		print "Magnet: ", self.magnet
-		print "Download: ", self.download
+		print("Title:", self.title)
+		print("Category:", self.category)
+		print("Page: ", self.page)
+		print("Size: ", self.size)
+		print("Files: ", self.files)
+		print("Age: ", self.age)
+		print("Seeds:", self.seeders)
+		print("Leechers: ", self.leechers)
+		print("Magnet: ", self.magnet)
+		print("Download: ", self.download)
 
 	@property
 	def download(self):
 		if self._download:
 			return self._download
-		
+
 		if self._data:
 			self._download = self._data.find("a", class_="siteButton giantButton").get("href")
 			return self._download
@@ -143,7 +143,7 @@ class Search(object):
 	def search(self, term=None, category=None, pages=1, url=search_url,
 				sort=None, order=None):
 		"""Search a given URL for torrent results."""
-	
+
 		if not self.current_url:
 			self.current_url = url
 
@@ -158,7 +158,7 @@ class Search(object):
 
 			# Now get the results.
 			for i in range(pages):
-				results = self._get_results(search + "/" + str(self._current_page) + 
+				results = self._get_results(search + "/" + str(self._current_page) +
 											"/" + sorting)
 				self._add_results(results)
 				self._current_page += 1
@@ -173,7 +173,7 @@ class Search(object):
 		self.search(pages=pages, url=Search.latest_url, sort=sort, order=order)
 		if category:
 			self._categorize(category)
-		
+
 	def _categorize(self, category):
 		"""Remove torrents with unwanted category from self.torrents"""
 		self.torrents = [result for result in self.torrents
@@ -205,9 +205,9 @@ class Search(object):
 	def page(self, i):
 		"""Get page i of search results"""
 		# Need to clear previous results.
-		self.torrents = list() 
-		self._current_page = i 
-		self.search(term=self.term, category=self.category, 
+		self.torrents = list()
+		self._current_page = i
+		self.search(term=self.term, category=self.category,
 					sort=self.sort, order=self.order)
 
 	def next_page(self):
@@ -215,13 +215,13 @@ class Search(object):
 		self.page(self._current_page + 1)
 
 	def _get_results(self, page):
-		"""Find every div tag containing torrent details on given page, 
+		"""Find every div tag containing torrent details on given page,
 			then parse the results into a list of Torrents and return them"""
-		
+
 		soup = _get_soup(page)
 		details = soup.find_all("tr", class_="odd")
 		even = soup.find_all("tr", class_="even")
-		# Join the results 
+		# Join the results
 		for i in range(len(even)):
 			details.insert((i * 2)+1, even[i])
 
@@ -229,16 +229,16 @@ class Search(object):
 
 	def _parse_details(self, tag_list):
 		"""Given a list of tags from either a search page or the
-		   KAT home page parse the details and return a list of 
+		   KAT home page parse the details and return a list of
 		   Torrents"""
-   
+
 		result = list()
 		for i, item in enumerate(tag_list):
-			title = item.find("a", class_="normalgrey font12px plain bold")
+			title = item.find("a", class_="cellMainLink")
 			title_text = title.text
 			link = title.get("href")
 			tds = item.find_all("td", class_="center") # Better name here.
-			size = tds[0].text 
+			size = tds[0].text
 			files = tds[1].text
 			age = tds[2].text
 			seed = tds[3].text
@@ -270,11 +270,11 @@ class Search(object):
 		   the form <a href='/tv/'>TV</a> with TV replaced with movies, books
 		   etc. For the home page I will use the result number to
 		   decide the category"""
-		
+
 		hrefs = ["/movies/", "/tv/", "/music/", "/games/", "/applications/", "/anime/",
 				 "/books/", "/xxx/"]
-		category = None 
-		if not result is None: # if result: 0 returns false. 
+		category = None
+		if not result is None: # if result: 0 returns false.
 			# Searching home page, get category from result number
 			category = hrefs[result / 10].strip("/")
 			return category
@@ -305,7 +305,7 @@ class Search(object):
 
 # Functions to be called by user -----------------------------------------
 def search(term, category=Categories.ALL, pages=1, sort=None, order=None):
-	"""Return a search result for term in category. Can also be 
+	"""Return a search result for term in category. Can also be
 		sorted and span multiple pages."""
 	s = Search()
 	s.search(term=term, category=category, pages=pages, sort=sort, order=order)
@@ -320,7 +320,7 @@ def popular(category=None):
 	return s
 
 def recent(category=None, pages=1, sort=None, order=None):
-	"""Return most recently added torrents. Can be sorted and categorized 
+	"""Return most recently added torrents. Can be sorted and categorized
 		and contain multiple pages."""
 	s = Search()
 	s.recent(category, pages, sort, order)
