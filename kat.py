@@ -39,6 +39,21 @@ def _get_soup(page):
 	data = request.text
 	return bs4.BeautifulSoup(data)
 
+def set_base_url(url):
+	Search._set_base_url(_format_url(url))
+
+def _format_url(url):
+	# Make sure base url given is formatted correctly.
+
+	if not url.startswith("http://"):
+		url = "http://" + url
+
+	if url.endswith("/"):
+		# Remove trailing /
+		url = url[:-1]
+	return url
+
+
 class Categories:
 	ALL = "all"
 	MOVIES = "movies"
@@ -68,7 +83,7 @@ class Torrent(object):
 				 download, files, age):
 		self.title = title
 		self.category = category
-		self.page = "http://kickass.to" + link
+		self.page = Search.base_url + link
 		self.size = size
 		self.seeders = seed
 		self.leechers = leech
@@ -97,12 +112,12 @@ class Torrent(object):
 			return self._download
 
 		if self._data:
-			self._download = self._data.find("a", class_="siteButton giantButton").get("href")
+			self._download = self._data.find("a", class_="siteButton giantButton verifTorrentButton").get("href")
 			return self._download
 
 		# No data. Parse torrent page
 		soup = _get_soup(self.page)
-		self._download = soup.find("a", class_="siteButton giantButton").get("href")
+		self._download = soup.find("a", class_="siteButton giantButton verifTorrentButton").get("href")
 		self._data = soup # Store for later
 		return self._download
 
@@ -112,11 +127,11 @@ class Torrent(object):
 			return self._magnet
 
 		if self._data:
-			self._magnet = self._data.find("a", class_="magnetlinkButton").get("href")
+			self._magnet = self._data.find("a", class_="siteButton giantIcon magnetlinkButton").get("href")
 			return self._magnet
 
 		soup = _get_soup(self.page)
-		self._magnet = soup.find("a", class_="magnetlinkButton").get("href")
+		self._magnet = soup.find("a", class_="siteButton giantIcon magnetlinkButton").get("href")
 		self._data = soup
 		return self._magnet
 
@@ -288,6 +303,12 @@ class Search(object):
 	def _add_results(self, results):
 		for item in results:
 			self.torrents.append(item)
+
+	@staticmethod
+	def _set_base_url(url):
+		Search.base_url = url
+		Search.search_url = url + "/usearch/"
+		Search.latest_url = url + "/new"
 
 	@property
 	def current_page(self):
