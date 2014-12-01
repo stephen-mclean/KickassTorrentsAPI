@@ -180,10 +180,12 @@ class Search(object):
 				self._current_page += 1
 			self._current_page -= 1
 
-	def popular(self, category):
+	def popular(self, category, sortOption="title"):
 		self.search(url=Search.base_url)
 		if category:
 			self._categorize(category)
+		self.torrents.sort(key = lambda t: t.__getattribute__(sortOption))
+
 
 	def recent(self, category, pages, sort, order):
 		self.search(pages=pages, url=Search.latest_url, sort=sort, order=order)
@@ -333,12 +335,12 @@ def search(term, category=Categories.ALL, pages=1, sort=None, order=None):
 	s.search(term=term, category=category, pages=pages, sort=sort, order=order)
 	return s
 
-def popular(category=None):
+def popular(category=None, sortOption = "title"):
 	"""Return a search result containing torrents appearing
 		on the KAT home page. Can be categorized. Cannot be
 		sorted or contain multiple pages"""
 	s = Search()
-	s.popular(category)
+	s.popular(category, sortOption)
 	return s
 
 def recent(category=None, pages=1, sort=None, order=None):
@@ -359,4 +361,3 @@ if __name__ != '__main__':
 		Search.base_url = config.get('url', 'base_url')
 		Search.search_url = Search.base_url + "/usearch/"
 		Search.latest_url = Search.base_url+"/new"
-		print Search.base_url,Search.search_url, Search.latest_url
