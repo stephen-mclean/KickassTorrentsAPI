@@ -32,6 +32,7 @@ DEALINGS IN THE SOFTWARE."""
 
 import bs4
 import requests
+import ConfigParser
 
 def _get_soup(page):
 	"""Return BeautifulSoup object for given page"""
@@ -348,3 +349,14 @@ def recent(category=None, pages=1, sort=None, order=None):
 	return s
 
 # -----------------------------------------------------------------------
+
+
+
+#module init
+if __name__ != '__main__':
+		config = ConfigParser.ConfigParser()
+		config.read('conf.cfg')
+		Search.base_url = config.get('url', 'base_url')
+		Search.search_url = Search.base_url + "/usearch/"
+		Search.latest_url = Search.base_url+"/new"
+		print Search.base_url,Search.search_url, Search.latest_url
