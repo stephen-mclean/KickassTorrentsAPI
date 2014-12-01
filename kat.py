@@ -142,9 +142,9 @@ class Search(object):
 	   returning popular torrents from the home page. The results are
 	   of type Torrent and can be iterated over."""
 
-	base_url = "http://kickass.to/"
-	search_url = "http://kickass.to/usearch/"
-	latest_url = "http://kickass.to/new"
+	base_url = "http://katproxy.com"
+	search_url = base_url + "usearch/"
+	latest_url = base_url+"new"
 
 	def __init__(self):
 		self.torrents = list()
