@@ -80,7 +80,7 @@ class Torrent(object):
 	"""Represents a torrent as found in KAT search results"""
 
 	def __init__(self, title, category, link, size, seed, leech, magnet,
-				 download, files, age):
+				 download, files, age, isVerified):
 		self.title = title
 		self.category = category
 		self.page = Search.base_url + link
@@ -92,6 +92,7 @@ class Torrent(object):
 		self.files = files
 		self.age = age
 		self._data = None # bs4 html for getting download & magnet
+		self.isVerified = isVerified
 
 	def print_details(self):
 		"""Print torrent details"""
@@ -105,6 +106,7 @@ class Torrent(object):
 		print("Leechers: ", self.leechers)
 		print("Magnet: ", self.magnet)
 		print("Download: ", self.download)
+		print("Verified:", self.isVerified)
 
 	@property
 	def download(self):
@@ -260,6 +262,7 @@ class Search(object):
 			leech = tds[4].text
 			magnet = item.find("a", class_="imagnet icon16")
 			download = item.find("a", class_="idownload icon16")
+			isVerified = item.find("a", class_="iverify icon16") != None
 
 			# Home page doesn't have magnet or download links
 			if magnet:
@@ -275,7 +278,7 @@ class Search(object):
 				category = self._get_torrent_category(item)
 
 			result.append(Torrent(title_text, category, link, size, seed,
-								leech, magnet, download,files, age))
+								leech, magnet, download,files, age, isVerified))
 
 		return result
 
